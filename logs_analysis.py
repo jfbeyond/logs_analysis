@@ -1,10 +1,12 @@
+#!/usr/bin/python2.7
+
 import psycopg2
 
 DBNAME = "news"
 db = psycopg2.connect(database=DBNAME)
 c = db.cursor()
 
-# Query to extract the articles with their number of views, organized
+# First query to extract the articles with their number of views, organized
 # by descendent number
 c.execute("select title,count(*) as num from articles,\
     (select path as artpath from log) as subq\
@@ -18,7 +20,7 @@ print
 for row in popular:
     print row[0], 'with a total of', row[1], 'views'
 
-# Second query
+# Second question
 # Create view that summarizes number of views per article by using 'slug'
 c.execute("create view totals as  select slug, count(*) \
     as reads from articles,(select path as artpath from log) as subq \
@@ -37,7 +39,7 @@ print
 for row in popular_authors:
     print row[0], 'with a total of', row[1], 'views'
 
-# Third  query
+# Third  question
 # Create view for table containing number of total and failed requests per day
 c.execute("create view datelogs as select date(time) as logdate, count(*) \
     filter (where status = '404 NOT FOUND') as numfails, count(*) \
@@ -54,7 +56,7 @@ print
 for row in failed_req:
     fail_per = str("%.2f" % row[1])
     print row[0].strftime("On %b %d, %Y,"), 'the percentage of requests that'\
-        'led to errors was', fail_per, '%.'
+        ' led to errors was', fail_per, '%.'
 print
 
 db.close()
